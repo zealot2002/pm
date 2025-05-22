@@ -5,7 +5,7 @@
         <el-option v-for="item in projectOptions" :key="item.id" :label="item.name" :value="item.id" />
       </el-select>
       
-      <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="handleCreate" v-if="userInfo.qx === 1">
+      <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="handleCreate">
         添加模块
       </el-button>
     </div>
@@ -36,21 +36,6 @@
       <el-table-column width="180px" align="center" label="结束日期">
         <template slot-scope="scope">
           <span>{{ scope.row.enddate }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column width="120px" align="center" label="后端负责人">
-        <template slot-scope="scope">
-          <span>{{ getEmployeeName(scope.row.bid) }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column width="120px" align="center" label="前端负责人">
-        <template slot-scope="scope">
-          <span>{{ getEmployeeName(scope.row.fid) }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column width="120px" align="center" label="设计负责人">
-        <template slot-scope="scope">
-          <span>{{ getEmployeeName(scope.row.did) }}</span>
         </template>
       </el-table-column>
       <el-table-column width="180px" align="center" label="操作">
@@ -89,21 +74,6 @@
         </el-form-item>
         <el-form-item label="结束日期" prop="enddate">
           <el-date-picker v-model="temp.enddate" type="date" placeholder="选择结束日期" value-format="yyyy-MM-dd" />
-        </el-form-item>
-        <el-form-item label="后端负责人" prop="bid">
-          <el-select v-model="temp.bid" placeholder="请选择后端负责人" clearable>
-            <el-option v-for="item in employeeOptions" :key="item.id" :label="item.name" :value="item.id" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="前端负责人" prop="fid">
-          <el-select v-model="temp.fid" placeholder="请选择前端负责人" clearable>
-            <el-option v-for="item in employeeOptions" :key="item.id" :label="item.name" :value="item.id" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="设计负责人" prop="did">
-          <el-select v-model="temp.did" placeholder="请选择设计负责人" clearable>
-            <el-option v-for="item in employeeOptions" :key="item.id" :label="item.name" :value="item.id" />
-          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">

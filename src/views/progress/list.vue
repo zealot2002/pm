@@ -178,7 +178,7 @@ export default {
     getProjects() {
       getProjectList({}).then(response => {
         if (response.code === 1) {
-          this.projectOptions = response.data.data
+          this.projectOptions = response.data
           // 创建项目ID到名称的映射
           this.projectOptions.forEach(item => {
             this.projectMap[item.id] = item.name
@@ -205,7 +205,7 @@ export default {
       this.listLoading = true
       getProgressList(this.listQuery).then(response => {
         if (response.code === 1) {
-          this.list = response.data.data
+          this.list = response.data
           this.total = response.data.total || response.data.data.length
         } else {
           Message.error(response.msg || '获取进度列表失败')

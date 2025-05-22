@@ -7,8 +7,8 @@ const baseUrl = process.env.VUE_APP_BASE_API + 'qhmanage/Dailyservice/'
 export function getDailyList(params) {
   return https.post(baseUrl + 'dailylist', {
     activityid: process.env.VUE_APP_ACTIVITY_ID,
-    eid: params.eid || getUserId(),
-    pid: params.pid || 0,
+    eid: params.eid + '' || getUserId(),
+    pid: params.pid || '',
     page: params.page || 1,
     pagecount: params.pagecount || 10
   })
@@ -18,9 +18,9 @@ export function getDailyList(params) {
 export function addDaily(params) {
   return https.post(baseUrl + 'adddaily', {
     activityid: process.env.VUE_APP_ACTIVITY_ID,
-    pid: params.pid || 0,
-    mid: params.mid || 0,
-    eid: params.eid || getUserId(),
+    pid: params.pid + '' ,
+    mid: params.mid + '' ,
+    eid: params.eid + '' || getUserId(),
     rem: params.rem
   })
 }

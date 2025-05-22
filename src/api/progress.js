@@ -8,7 +8,7 @@ export function getProgressList(params) {
   return https.post(baseUrl + 'jdlist', {
     activityid: process.env.VUE_APP_ACTIVITY_ID,
     eid: params.eid || getUserId(),
-    pid: params.pid || 0,
+    pid: params.pid || '',
     page: params.page || 1,
     pagecount: params.pagecount || 10
   })

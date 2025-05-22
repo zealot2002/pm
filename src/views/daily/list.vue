@@ -41,14 +41,14 @@
       </el-table-column>
       <el-table-column width="180px" align="center" label="添加时间">
         <template slot-scope="scope">
-          <span>{{ scope.row.addtime }}</span>
+          <span>{{ formatTime(scope.row.addtime) }}</span>
         </template>
       </el-table-column>
       <el-table-column width="180px" align="center" label="操作">
         <template slot-scope="scope">
           <div style="display: flex; justify-content: center; gap: 10px;">
-            <el-button type="primary" size="mini" @click="handleUpdate(scope.row)" v-if="scope.row.eid === userId">编辑</el-button>
-            <el-button type="danger" size="mini" @click="handleDelete(scope.row)" v-if="scope.row.eid === userId">删除</el-button>
+            <el-button type="primary" size="mini" @click="handleUpdate(scope.row)" v-if="scope.row.eid + '' === userId + ''">编辑</el-button>
+            <el-button type="danger" size="mini" @click="handleDelete(scope.row)" v-if="scope.row.eid + '' === userId + ''">删除</el-button>
           </div>
         </template>
       </el-table-column>
@@ -158,7 +158,7 @@ export default {
     getProjects() {
       getProjectList({}).then(response => {
         if (response.code === 1) {
-          this.projectOptions = response.data.data
+          this.projectOptions = response.data
           // 创建项目ID到名称的映射
           this.projectOptions.forEach(item => {
             this.projectMap[item.id] = item.name
@@ -218,6 +218,19 @@ export default {
     
     getEmployeeName(id) {
       return id && this.employeeMap[id] ? this.employeeMap[id] : '未知员工'
+    },
+    
+    formatTime(timestamp) {
+      if (!timestamp) return '未知时间'
+      
+      const date = new Date(parseInt(timestamp) * 1000)
+      const year = date.getFullYear()
+      const month = (date.getMonth() + 1).toString().padStart(2, '0')
+      const day = date.getDate().toString().padStart(2, '0')
+      const hours = date.getHours().toString().padStart(2, '0')
+      const minutes = date.getMinutes().toString().padStart(2, '0')
+      
+      return `${year}-${month}-${day} ${hours}:${minutes}`
     },
     
     handleProjectChange() {

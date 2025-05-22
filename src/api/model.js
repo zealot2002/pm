@@ -22,10 +22,10 @@ export function addModel(params) {
     rem: params.rem,
     startdate: params.startdate,
     enddate: params.enddate,
-    bid: params.bid || 0,
-    fid: params.fid || 0,
-    did: params.did || 0,
-    pid: params.pid
+    bid: params.bid + '' ,
+    fid: params.fid + '' ,
+    did: params.did + '' ,
+    pid: params.pid + ''
   })
 }
 
