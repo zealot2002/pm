@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-container">
-    <div class="dashboard-header">交易担保后台</div>
+    <div class="dashboard-header">项目管理系统</div>
   </div>
 </template>
 

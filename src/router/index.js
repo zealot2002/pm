@@ -108,6 +108,7 @@ export function getAsyncRoutes() {
 function getRoutesByType() {
   try {
     const type = String(getUserType())
+    console.log('zzy getRoutesByType type ', type)
 
     switch (type) {
       case '1':

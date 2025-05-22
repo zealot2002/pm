@@ -171,9 +171,10 @@ export default {
             if (res.code === 1) {
               const token = JSON.stringify(this.loginForm)
               console.log(' setToken: [', res)
-              // setToken(token)
-              // setUserType(res.data.type)
+              setToken(token)
+              setUserType(res.data.qx || '1')
               setUserId(res.data.id)
+              setNickname(res.data.name)
               this.$router.push('/')
             } else {
               Message({

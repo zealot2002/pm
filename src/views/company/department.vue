@@ -121,9 +121,7 @@ export default {
     getList() {
       this.listLoading = true
       const params = {}
-      if (this.listQuery.cid) {
-        params.cid = this.listQuery.cid
-      }
+        params.cid = this.listQuery.cid||''
       
       getDepartmentList(params).then(response => {
         if (response.code === 1) {

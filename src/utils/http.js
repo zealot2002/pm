@@ -121,6 +121,7 @@ const http = {
 
       // const parameter = JSON.parse(localStorage.getItem('params'))
       params.activityid = process.env.VUE_APP_ACTIVITY_ID// parameter.activityid
+      params.eid = getUserId()// parameter.activityid
 
       for (const key in params) {
         if (key === 'long_data') {
