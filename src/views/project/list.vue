@@ -113,7 +113,7 @@ export default {
       this.listLoading = true
       getProjectList({}).then(response => {
         if (response.code === 1) {
-          this.list = response.data.data
+          this.list = response.data
         } else {
           Message.error(response.msg || '获取项目列表失败')
         }
