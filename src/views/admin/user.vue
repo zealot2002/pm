@@ -73,13 +73,16 @@
           <el-input v-model="temp.empnum" :disabled="dialogStatus === 'update' && userInfo.qx === 0" />
         </el-form-item>
         <el-form-item label="密码" prop="passwd">
-          <el-input v-model="temp.passwd" type="password" />
+          <el-input 
+            v-model="temp.passwd" 
+            placeholder="请输入密码" 
+          />
         </el-form-item>
         <el-form-item label="公司" prop="belongName" :disabled="dialogStatus === 'update' && userInfo.qx === 0">
           <el-select 
             v-model="temp.belongName" 
             placeholder="请选择公司" 
-            :disabled="dialogStatus === 'update' && userInfo.qx === 0"
+            :disabled="dialogStatus === 'update'"
             @change="handleCompanyChange"
           >
             <el-option 
@@ -94,7 +97,7 @@
           <el-select 
             v-model="temp.departmentName" 
             placeholder="请选择部门" 
-            :disabled="dialogStatus === 'update' && userInfo.qx === 0 || !temp.belongName"
+            :disabled="dialogStatus === 'update'"
             @change="handleDepartmentChange"
           >
             <el-option 
@@ -195,15 +198,20 @@ export default {
     },
 
     fetchCompanyList() {
-      getCompanyList({}).then(response => {
-        if (response.code === 1) {
-          this.companyList = response.data.data || []
-        } else {
-          Message.error(response.msg || '获取公司列表失败')
-        }
-      }).catch(error => {
-        console.error('获取公司列表失败:', error)
-        Message.error('获取公司列表失败')
+      return new Promise((resolve, reject) => {
+        getCompanyList({}).then(response => {
+          if (response.code === 1) {
+            this.companyList = response.data.data || []
+            resolve()
+          } else {
+            Message.error(response.msg || '获取公司列表失败')
+            reject(new Error(response.msg || '获取公司列表失败'))
+          }
+        }).catch(error => {
+          console.error('获取公司列表失败:', error)
+          Message.error('获取公司列表失败')
+          reject(error)
+        })
       })
     },
     
@@ -276,6 +284,27 @@ export default {
       this.temp.belongName = this.temp.belong
       this.temp.departmentName = this.temp.department
       
+      // 确保权限值为数字类型
+      this.temp.qx = parseInt(this.temp.qx, 10)
+      
+      // 首先加载公司列表（如果尚未加载）
+      if (this.companyList.length === 0) {
+        this.fetchCompanyList().then(() => {
+          this.loadDepartmentsForEdit();
+        });
+      } else {
+        this.loadDepartmentsForEdit();
+      }
+      
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
+      
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
+
+    loadDepartmentsForEdit() {
       // 根据公司名称查找ID
       const selectedCompany = this.companyList.find(item => item.name === this.temp.belongName)
       if (selectedCompany) {
@@ -296,20 +325,13 @@ export default {
           console.error('获取部门列表失败:', error)
         })
       }
-      
-      this.temp.passwd = '' // 清空密码字段
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
     },
 
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
+          
           updateAdmin(tempData).then(response => {
             if (response.code === 1) {
               this.dialogFormVisible = false
