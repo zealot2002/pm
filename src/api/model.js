@@ -20,12 +20,13 @@ export function addModel(params) {
     activityid: process.env.VUE_APP_ACTIVITY_ID,
     modelname: params.modelname,
     rem: params.rem,
+    state: params.state + '',
     startdate: params.startdate,
     enddate: params.enddate,
-    bid: params.bid + '' ,
-    fid: params.fid + '' ,
-    did: params.did + '' ,
-    pid: params.pid + ''
+    bid: params.bid || '',
+    fid: params.fid || '',
+    did: params.did || '',
+    pid: params.pid || ''
   })
 }
 
@@ -36,12 +37,13 @@ export function updateModel(params) {
     id: params.id,
     modelname: params.modelname,
     rem: params.rem,
+    state: params.state + '',
     startdate: params.startdate,
     enddate: params.enddate,
-    bid: params.bid || 0,
-    fid: params.fid || 0,
-    did: params.did || 0,
-    pid: params.pid
+    bid: params.bid || '',
+    fid: params.fid || '',
+    did: params.did || '',
+    pid: params.pid || ''
   })
 }
 

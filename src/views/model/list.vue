@@ -28,6 +28,11 @@
           <span>{{ getProjectName(scope.row.pid) }}</span>
         </template>
       </el-table-column>
+      <el-table-column width="120px" align="center" label="状态">
+        <template slot-scope="scope">
+          <el-tag :type="getStatusType(scope.row.state)">{{ getStatusText(scope.row.state) }}</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column width="180px" align="center" label="开始日期">
         <template slot-scope="scope">
           <span>{{ scope.row.startdate }}</span>
@@ -66,6 +71,11 @@
         <el-form-item label="模块名称" prop="modelname">
           <el-input v-model="temp.modelname" />
         </el-form-item>
+        <el-form-item label="状态" prop="state">
+          <el-select v-model="temp.state" placeholder="请选择状态">
+            <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="说明" prop="rem">
           <el-input v-model="temp.rem" type="textarea" :rows="3" />
         </el-form-item>
@@ -101,6 +111,11 @@ export default {
       projectMap: {},
       employeeOptions: [],
       employeeMap: {},
+      statusOptions: [
+        { value: 0, label: '未开始' },
+        { value: 1, label: '进行中' },
+        { value: 2, label: '已完成' }
+      ],
       userInfo: {
         qx: getUserType(),
         eid: getUserId()
@@ -118,6 +133,7 @@ export default {
         startdate: '',
         enddate: '',
         pid: undefined,
+        state: 0,
         bid: undefined,
         fid: undefined,
         did: undefined
@@ -127,6 +143,7 @@ export default {
       rules: {
         pid: [{ required: true, message: '请选择项目', trigger: 'change' }],
         modelname: [{ required: true, message: '模块名称不能为空', trigger: 'blur' }],
+        state: [{ required: true, message: '请选择状态', trigger: 'change' }],
         startdate: [{ required: true, message: '开始日期不能为空', trigger: 'change' }],
         enddate: [{ required: true, message: '结束日期不能为空', trigger: 'change' }]
       }
@@ -138,6 +155,30 @@ export default {
     this.getList()
   },
   methods: {
+    getStatusText(state) {
+      switch (Number(state)) {
+        case 0:
+          return '未开始'
+        case 1:
+          return '进行中'
+        case 2:
+          return '已完成'
+        default:
+          return '未知状态'
+      }
+    },
+    getStatusType(state) {
+      switch (Number(state)) {
+        case 0:
+          return 'info'
+        case 1:
+          return 'warning'
+        case 2:
+          return 'success'
+        default:
+          return 'info'
+      }
+    },
     getProjects() {
       getProjectList({}).then(response => {
         if (response.code === 1) {
@@ -218,6 +259,7 @@ export default {
         startdate: '',
         enddate: '',
         pid: this.listQuery.pid,
+        state: 0,
         bid: undefined,
         fid: undefined,
         did: undefined
@@ -236,7 +278,8 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          addModel(this.temp).then(response => {
+          const tempData = Object.assign({}, this.temp)
+          addModel(tempData).then(response => {
             if (response.code === 1) {
               this.dialogFormVisible = false
               Message.success('创建成功')

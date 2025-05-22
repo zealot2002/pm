@@ -57,7 +57,6 @@ const adminRoutes = [
   adminRouter,
   projectRouter,
   modelRouter,
-  progressRouter,
   dailyRouter,
   versionRouter
 ]
@@ -66,7 +65,6 @@ const adminRoutes = [
 const normalRoutes = [
   projectRouter,
   modelRouter,
-  progressRouter,
   dailyRouter,
   versionRouter
 ]
