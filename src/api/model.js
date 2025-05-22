@@ -8,7 +8,9 @@ export function getModelList(params) {
   return https.post(baseUrl + 'modellist', {
     activityid: process.env.VUE_APP_ACTIVITY_ID,
     pid: params.pid || 0,
-    eid: params.eid || getUserId()
+    eid: params.eid || getUserId(),
+    page: params.page || 1,
+    pagecount: params.pagecount || 10
   })
 }
 

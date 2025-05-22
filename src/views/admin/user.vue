@@ -75,11 +75,35 @@
         <el-form-item label="密码" prop="passwd">
           <el-input v-model="temp.passwd" type="password" />
         </el-form-item>
-        <el-form-item label="部门" prop="department" :disabled="dialogStatus === 'update' && userInfo.qx === 0">
-          <el-input v-model="temp.department" :disabled="dialogStatus === 'update' && userInfo.qx === 0" />
+        <el-form-item label="公司" prop="belongName" :disabled="dialogStatus === 'update' && userInfo.qx === 0">
+          <el-select 
+            v-model="temp.belongName" 
+            placeholder="请选择公司" 
+            :disabled="dialogStatus === 'update' && userInfo.qx === 0"
+            @change="handleCompanyChange"
+          >
+            <el-option 
+              v-for="item in companyList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.name"
+            />
+          </el-select>
         </el-form-item>
-        <el-form-item label="公司" prop="belong" :disabled="dialogStatus === 'update' && userInfo.qx === 0">
-          <el-input v-model="temp.belong" :disabled="dialogStatus === 'update' && userInfo.qx === 0" />
+        <el-form-item label="部门" prop="departmentName" :disabled="dialogStatus === 'update' && userInfo.qx === 0">
+          <el-select 
+            v-model="temp.departmentName" 
+            placeholder="请选择部门" 
+            :disabled="dialogStatus === 'update' && userInfo.qx === 0 || !temp.belongName"
+            @change="handleDepartmentChange"
+          >
+            <el-option 
+              v-for="item in departmentList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.name"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="权限" prop="qx" :disabled="dialogStatus === 'update' && userInfo.qx === 0">
           <el-select v-model="temp.qx" placeholder="请选择权限" :disabled="dialogStatus === 'update' && userInfo.qx === 0">
@@ -98,6 +122,7 @@
 
 <script>
 import { getAdminList, addAdmin, updateAdmin, deleteAdmin } from '@/api/admin'
+import { getCompanyList, getDepartmentList } from '@/api/company'
 import { Message, MessageBox } from 'element-ui'
 import { getUserType } from '@/utils/SpUtil'
 
@@ -107,6 +132,8 @@ export default {
     return {
       list: null,
       listLoading: true,
+      companyList: [],
+      departmentList: [],
       userInfo: {
         qx: getUserType()
       },
@@ -116,7 +143,9 @@ export default {
         empnum: '',
         passwd: '',
         department: '',
+        departmentName: '',
         belong: '',
+        belongName: '',
         qx: 0
       },
       dialogFormVisible: false,
@@ -125,13 +154,14 @@ export default {
         name: [{ required: true, message: '姓名不能为空', trigger: 'blur' }],
         empnum: [{ required: true, message: '员工编号不能为空', trigger: 'blur' }],
         passwd: [{ required: true, message: '密码不能为空', trigger: 'blur' }],
-        department: [{ required: true, message: '部门不能为空', trigger: 'blur' }],
-        belong: [{ required: true, message: '公司不能为空', trigger: 'blur' }]
+        departmentName: [{ required: true, message: '部门不能为空', trigger: 'blur' }],
+        belongName: [{ required: true, message: '公司不能为空', trigger: 'blur' }]
       }
     }
   },
   created() {
     this.getList()
+    this.fetchCompanyList()
   },
   methods: {
     getList() {
@@ -157,15 +187,64 @@ export default {
         empnum: '',
         passwd: '',
         department: '',
+        departmentName: '',
         belong: '',
+        belongName: '',
         qx: 0
       }
+    },
+
+    fetchCompanyList() {
+      getCompanyList({}).then(response => {
+        if (response.code === 1) {
+          this.companyList = response.data.data || []
+        } else {
+          Message.error(response.msg || '获取公司列表失败')
+        }
+      }).catch(error => {
+        console.error('获取公司列表失败:', error)
+        Message.error('获取公司列表失败')
+      })
+    },
+    
+    handleCompanyChange(companyName) {
+      this.temp.departmentName = ''
+      this.temp.department = ''
+      this.departmentList = []
+      
+      // 根据公司名称找到对应的公司ID
+      const selectedCompany = this.companyList.find(item => item.name === companyName)
+      if (!selectedCompany) return
+      
+      // 保存公司ID
+      this.temp.belong = selectedCompany.id
+      
+      getDepartmentList({ cid: selectedCompany.id }).then(response => {
+        if (response.code === 1) {
+          this.departmentList = response.data.data || []
+        } else {
+          Message.error(response.msg || '获取部门列表失败')
+        }
+      }).catch(error => {
+        console.error('获取部门列表失败:', error)
+        Message.error('获取部门列表失败')
+      })
+    },
+    
+    handleDepartmentChange(departmentName) {
+      // 根据部门名称找到对应的部门ID
+      const selectedDepartment = this.departmentList.find(item => item.name === departmentName)
+      if (!selectedDepartment) return
+      
+      // 保存部门ID
+      this.temp.department = selectedDepartment.id
     },
 
     handleCreate() {
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
+      this.departmentList = []
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
@@ -192,9 +271,36 @@ export default {
 
     handleUpdate(row) {
       this.temp = Object.assign({}, row)
+      
+      // 将名称和ID保存到对应字段
+      this.temp.belongName = this.temp.belong
+      this.temp.departmentName = this.temp.department
+      
+      // 根据公司名称查找ID
+      const selectedCompany = this.companyList.find(item => item.name === this.temp.belongName)
+      if (selectedCompany) {
+        this.temp.belong = selectedCompany.id
+        
+        // 加载该公司下的部门列表
+        getDepartmentList({ cid: selectedCompany.id }).then(response => {
+          if (response.code === 1) {
+            this.departmentList = response.data.data || []
+            
+            // 根据部门名称查找ID
+            const selectedDepartment = this.departmentList.find(item => item.name === this.temp.departmentName)
+            if (selectedDepartment) {
+              this.temp.department = selectedDepartment.id
+            }
+          }
+        }).catch(error => {
+          console.error('获取部门列表失败:', error)
+        })
+      }
+      
       this.temp.passwd = '' // 清空密码字段
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
+      
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })

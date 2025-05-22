@@ -137,7 +137,9 @@ export default {
       },
       listQuery: {
         pid: undefined,
-        eid: getUserId()
+        eid: getUserId(), 
+        page: 1,
+        pagecount: 10
       },
       temp: {
         id: undefined,
@@ -169,7 +171,7 @@ export default {
     getProjects() {
       getProjectList({}).then(response => {
         if (response.code === 1) {
-          this.projectOptions = response.data.data
+          this.projectOptions = response.data
           // 创建项目ID到名称的映射
           this.projectOptions.forEach(item => {
             this.projectMap[item.id] = item.name
@@ -215,7 +217,9 @@ export default {
     getList() {
       this.listLoading = true
       const params = {
-        eid: this.listQuery.eid
+        eid: this.listQuery.eid,
+        page: this.listQuery.page,
+        pagecount: this.listQuery.pagecount
       }
       
       if (this.listQuery.pid) {
